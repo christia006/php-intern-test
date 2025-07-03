@@ -59,7 +59,7 @@
         <div class="mb-6">
             <p class="text-gray-600 text-sm">Foto:</p>
             @if ($employee->photo_upload_path)
-                <img src="{{ $employee->photo_upload_path }}" alt="Foto {{ $employee->nama }}" class="w-48 h-48 object-cover rounded-lg shadow-md mt-2">
+                <img src="{{ Storage::url($employee->photo_upload_path) }}" alt="Foto {{ $employee->nama }}" class="w-48 h-48 object-cover rounded-lg shadow-md mt-2">
             @else
                 <p class="text-gray-600">Tidak ada foto.</p>
             @endif

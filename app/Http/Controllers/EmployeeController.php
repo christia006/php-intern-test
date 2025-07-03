@@ -31,15 +31,10 @@ class EmployeeController extends Controller
             'created_by' => 'nullable|string|max:150',
         ]);
 
-        $photoUrl = null;
+        $photoPath = null;
         if ($request->hasFile('photo')) {
-            try {
-                $file = $request->file('photo');
-                $photoPath = Storage::disk('s3')->put('employees_photos', $file, 'public');
-                $photoUrl = Storage::disk('s3')->url($photoPath);
-            } catch (\Exception $e) {
-                return redirect()->back()->withInput()->withErrors(['photo' => 'Gagal mengunggah foto.']);
-            }
+            $file = $request->file('photo');
+            $photoPath = Storage::disk('public')->put('employees_photos', $file);
         }
 
         $employee = new Employee();
@@ -47,7 +42,7 @@ class EmployeeController extends Controller
         $employee->nama = $request->nama;
         $employee->jabatan = $request->jabatan;
         $employee->talahir = $request->talahir;
-        $employee->photo_upload_path = $photoUrl;
+        $employee->photo_upload_path = $photoPath;
         $employee->created_on = now();
         $employee->created_by = $request->created_by ?? 'system';
         $employee->save();
@@ -87,43 +82,26 @@ class EmployeeController extends Controller
             'updated_by' => 'nullable|string|max:150',
         ]);
 
-        $photoUrl = $employee->photo_upload_path;
+        $photoPath = $employee->photo_upload_path;
 
         if ($request->hasFile('photo')) {
-            try {
-                if ($employee->photo_upload_path) {
-                    $oldPath = parse_url($employee->photo_upload_path, PHP_URL_PATH);
-                    if (substr($oldPath, 0, 1) === '/') {
-                        $oldPath = substr($oldPath, 1);
-                    }
-                    if (Storage::disk('s3')->exists($oldPath)) {
-                        Storage::disk('s3')->delete($oldPath);
-                    }
-                }
-                $file = $request->file('photo');
-                $photoPath = Storage::disk('s3')->put('employees_photos', $file, 'public');
-                $photoUrl = Storage::disk('s3')->url($photoPath);
-            } catch (\Exception $e) {
-                return redirect()->back()->withInput()->withErrors(['photo' => 'Gagal mengunggah foto baru.']);
+            if ($employee->photo_upload_path && Storage::disk('public')->exists($employee->photo_upload_path)) {
+                Storage::disk('public')->delete($employee->photo_upload_path);
             }
+            $file = $request->file('photo');
+            $photoPath = Storage::disk('public')->put('employees_photos', $file);
         } elseif ($request->input('remove_photo')) {
-            if ($employee->photo_upload_path) {
-                $oldPath = parse_url($employee->photo_upload_path, PHP_URL_PATH);
-                if (substr($oldPath, 0, 1) === '/') {
-                    $oldPath = substr($oldPath, 1);
-                }
-                if (Storage::disk('s3')->exists($oldPath)) {
-                    Storage::disk('s3')->delete($oldPath);
-                }
+            if ($employee->photo_upload_path && Storage::disk('public')->exists($employee->photo_upload_path)) {
+                Storage::disk('public')->delete($employee->photo_upload_path);
             }
-            $photoUrl = null;
+            $photoPath = null;
         }
 
         $employee->nomor = $request->nomor;
         $employee->nama = $request->nama;
         $employee->jabatan = $request->jabatan;
         $employee->talahir = $request->talahir;
-        $employee->photo_upload_path = $photoUrl;
+        $employee->photo_upload_path = $photoPath;
         $employee->updated_on = now();
         $employee->updated_by = $request->updated_by ?? 'system';
         $employee->save();
@@ -135,17 +113,8 @@ class EmployeeController extends Controller
 
     public function destroy(Employee $employee)
     {
-        if ($employee->photo_upload_path) {
-            try {
-                $pathToDelete = parse_url($employee->photo_upload_path, PHP_URL_PATH);
-                if (substr($pathToDelete, 0, 1) === '/') {
-                    $pathToDelete = substr($pathToDelete, 1);
-                }
-                if (Storage::disk('s3')->exists($pathToDelete)) {
-                    Storage::disk('s3')->delete($pathToDelete);
-                }
-            } catch (\Exception $e) {
-            }
+        if ($employee->photo_upload_path && Storage::disk('public')->exists($employee->photo_upload_path)) {
+            Storage::disk('public')->delete($employee->photo_upload_path);
         }
 
         $employee->delete();

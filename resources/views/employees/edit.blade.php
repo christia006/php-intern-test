@@ -67,7 +67,7 @@
             <div class="mb-4">
                 <label for="photo" class="block text-gray-700 text-sm font-bold mb-2">Foto Saat Ini:</label>
                 @if ($employee->photo_upload_path)
-                    <img src="{{ $employee->photo_upload_path }}" alt="Foto {{ $employee->nama }}" class="w-32 h-32 object-cover rounded-lg shadow-sm mb-2">
+                    <img src="{{ Storage::url($employee->photo_upload_path) }}" alt="Foto {{ $employee->nama }}" class="w-32 h-32 object-cover rounded-lg shadow-sm mb-2">
                     <div class="flex items-center mb-2">
                         <input type="checkbox" name="remove_photo" id="remove_photo" class="mr-2">
                         <label for="remove_photo" class="text-gray-700 text-sm">Hapus foto ini</label>

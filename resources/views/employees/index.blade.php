@@ -54,7 +54,7 @@
                                 <td class="py-3 px-4 text-sm text-gray-800">{{ $employee->talahir ? $employee->talahir->format('d M Y') : '-' }}</td>
                                 <td class="py-3 px-4 text-sm text-gray-800">
                                     @if ($employee->photo_upload_path)
-                                        <img src="{{ $employee->photo_upload_path }}" alt="Foto {{ $employee->nama }}" class="w-12 h-12 object-cover rounded-full shadow-sm">
+                                        <img src="{{ Storage::url($employee->photo_upload_path) }}" alt="Foto {{ $employee->nama }}" class="w-12 h-12 object-cover rounded-full shadow-sm">
                                     @else
                                         <span class="text-gray-500">Tidak ada foto</span>
                                     @endif
